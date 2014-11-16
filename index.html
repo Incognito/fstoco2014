@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Title</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <style type="text/css">
+      @import url(http://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+nav,
+section,
+summary {
+  display: block;
+}
+audio,
+canvas,
+video {
+  display: inline-block;
+}
+audio:not([controls]) {
+  display: none;
+  height: 0;
+}
+[hidden] {
+  display: none;
+}
+html {
+  font-family: sans-serif;
+}
+body {
+  margin: 0;
+}
+a:focus {
+  outline: thin dotted;
+}
+a:active,
+a:hover {
+  outline: 0;
+}
+h1 {
+  font-size: 2em;
+}
+abbr[title] {
+  border-bottom: 1px dotted;
+}
+b,
+strong {
+  font-weight: bold;
+}
+dfn {
+  font-style: italic;
+}
+mark {
+  background: #ff0;
+  color: #000;
+}
+code,
+kbd,
+pre,
+samp {
+  font-family: monospace, serif;
+  font-size: 1em;
+}
+pre {
+  white-space: pre;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+q {
+  quotes: "\201C" "\201D" "\2018" "\2019";
+}
+small {
+  font-size: 80%;
+}
+sub,
+sup {
+  font-size: 75%;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+}
+sup {
+  top: -0.5em;
+}
+sub {
+  bottom: -0.25em;
+}
+img {
+  border: 0;
+}
+svg:not(:root) {
+  overflow: hidden;
+}
+figure {
+  margin: 0;
+}
+fieldset {
+  border: 1px solid #c0c0c0;
+  margin: 0 2px;
+  padding: 0.35em 0.625em 0.75em;
+}
+legend {
+  border: 0;
+/* 1 */
+  padding: 0;
+/* 2 */
+}
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+/* 1 */
+  font-size: 100%;
+/* 2 */
+  margin: 0;
+/* 3 */
+}
+button,
+input {
+  line-height: normal;
+}
+button,
+html input[type="button"],
+/* 1 */,
+input[type="reset"],
+input[type="submit"] {
+  -webkit-appearance: button;
+/* 2 */
+  cursor: pointer;
+/* 3 */
+}
+button[disabled],
+input[disabled] {
+  cursor: default;
+}
+input[type="checkbox"],
+input[type="radio"] {
+  box-sizing: border-box;
+/* 1 */
+  padding: 0;
+/* 2 */
+}
+input[type="search"] {
+  -webkit-appearance: textfield;
+/* 1 */
+  -moz-box-sizing: content-box;
+  -webkit-box-sizing: content-box;
+/* 2 */
+  box-sizing: content-box;
+}
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-decoration {
+  -webkit-appearance: none;
+}
+button::-moz-focus-inner,
+input::-moz-focus-inner {
+  border: 0;
+  padding: 0;
+}
+textarea {
+  overflow: auto;
+/* 1 */
+  vertical-align: top;
+/* 2 */
+}
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+/* Variables will be placed here */
+html,
+body {
+  height: 100%;
+  background-color: transparent;
+}
+body {
+  font-size: 16px;
+  color: #333;
+}
+body {
+  background-color: #e5e5e5;
+}
+.colors {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 10px;
+}
+.colors span {
+  display: block;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 20%;
+}
+.color-1 {
+  left: 0;
+  background-color: #333;
+}
+.color-2 {
+  left: 20%;
+  background-color: #333;
+}
+.color-3 {
+  left: 40%;
+  background-color: #e5e5e5;
+}
+.color-4 {
+  left: 60%;
+  background-color: #888;
+}
+.color-5 {
+  left: 80%;
+  right: 0;
+  width: auto !important;
+  background-color: #555;
+}
+.fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  padding: 0;
+  margin: 0;
+}
+.slide {
+  background: #e5e5e5;
+  width: 1024px;
+  height: 600px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: -300px;
+  margin-left: -512px;
+}
+h1 {
+  margin: 0;
+  padding: 0;
+  color: #333;
+  font-family: Helvetica, Arial, sans-serif;
+  font-weight: 700;
+  letter-spacing: -1px;
+  text-rendering: optimizeLegibility;
+}
+h2 {
+  margin: 0;
+  font-size: 0.5em;
+  padding: 0;
+  color: #888;
+  font-family: Georgia, serif;
+  font-weight: normal;
+  font-style: italic;
+  text-rendering: optimizeLegibility;
+}
+.slide-columns {
+  margin: 0 -20px;
+}
+.slide-columns:after {
+  content: "";
+  clear: both;
+  display: block;
+  height: 0;
+}
+.slide-columns .column {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -ms-box-sizing: border-box;
+  -o-box-sizing: border-box;
+  box-sizing: border-box;
+  padding: 0 20px;
+  float: left;
+}
+
+
+.slide-columns.columns-2 .column {
+  width: 50%;
+}
+.slide-columns.columns-3 .column {
+  width: 33%;
+}
+.slide-columns.columns-4 .column {
+  width: 25%;
+}
+.slide-columns.columns-5 .column {
+  width: 20%;
+}
+.slide-content {
+  position: relative;
+  z-index: 10;
+}
+.slide-content img {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -ms-box-sizing: border-box;
+  -o-box-sizing: border-box;
+  box-sizing: border-box;
+  padding: 10px;
+  background: #fff;
+  display: block;
+  max-width: 100%;
+  height: auto;
+  -webkit-box-shadow: rgba(0,0,0,0.5) 3px 3px 10px;
+  -moz-box-shadow: rgba(0,0,0,0.5) 3px 3px 10px;
+  -ms-box-shadow: rgba(0,0,0,0.5) 3px 3px 10px;
+  -o-box-shadow: rgba(0,0,0,0.5) 3px 3px 10px;
+  box-shadow: rgba(0,0,0,0.5) 3px 3px 10px;
+}
+footer {
+  position: absolute;
+  text-align: left;
+  left: 30px;
+  bottom: 20px;
+  right: 30px;
+  font-family: "Gill Sans", "Gill Sans MT", GillSans, Calibri, "Trebuchet MS", sans-serif;
+  text-transform: uppercase;
+  color: #888;
+  font-weight: 700;
+}
+footer .presentation-pagination {
+  position: absolute;
+  right: 0;
+  bototm: 0;
+}
+ul {
+  font-size: 1.3em;
+}
+ul li {
+  margin-top: 0.5em;
+}
+ul ul {
+  font-size: 0.8em;
+}
+.slide-content {
+  padding: 1px 0;
+}
+.slide-content p {
+  margin: 0 0 0.5em 0;
+}
+      .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+
+class: center, middle
+
+# Combine everything
+## Without dirty hacks
+
+@BrianJGraham
+
+---
+
+# What I work on
+
+* An educational Slideshow/Workshop
+* With teams that also get their own slides
+* Interactive forms ("games")
+* Users have very high expectations
+* Users are...
+  * High-level "decision makers"
+  * From Toronto to Bejing, Saudi Arabia to New Zealand.
+  * Behind really mean firewalls
+  * Even worse... Behind hotel WiFi
+
+---
+
+# Where things started
+
+* Symfony1.0 powered
+  * Web Dashboard
+  * App loading
+* Legacy Zend AMF code
+* Monolithic flash app
+  * Configured by manually built XML
+
+* The database was modified by external applications :(
+
+* ... it worked!
+
+---
+
+# Where things started
+
+![Default-aligned image](old_dt.png)
+
+* It worked... 
+* Where's the model?
+* How can we maintain this?
+
+
+---
+
+# Targeted elimination
+
+![Default-aligned image](old_dt_remove.png)
+
+* Remove dependency on external services
+  * Remove voodoo
+  * Remove CRM's DB
+
+
+---
+
+# Where the product is now
+
+* SF2 backend
+  * Transforms DB objects to JSON
+  * Builds XML file in compliance with backend logic
+
+Provides RESTful API endpoints
+Some business logic is still tightly coupled.
+Push JSON objects to redis queue
+NodeJS subscribes for new JSON and pushes to specific client
+More dynamic flash app with JS capable of changing logic, still some tight coupled logic
+Back-office uses APIs now
+Mobile app
+Back-office telemetry view and mobile app are just presentation clients like the slide show.
+No monoliths!
+Contracts!
+
+
+---
+
+# How we got there
+
+General concepts that will be repeated
+
+---
+
+# JavaScript gateway to Flash 
+
+So we had AMF… What’s AMF?
+Later we used JS, what’s that like?
+API interface
+XHR polling
+App interface
+Flash ExternalInterface
+
+---
+
+# Symfony2 Backend
+
+Add cache queue layer
+use redis queue because already use it for PHP session variable
+Talk about “threaded” issue of fetching data that changes each time
+Transform data to JSON (very interoperable format)
+Transform data to XML (flash app still uses this. we only added a JS gateway)
+
+---
+
+# Architecture
+
+![Default-aligned image](dt_1.png)
+
+---
+
+# Architecture
+
+![Default-aligned image](dt_2.png)
+
+---
+
+# Back office logic hooks
+
+Remove external database everything
+API calls put changes to a presentation
+Remove external database everything
+API calls put changes to a presentation
+
+---
+
+# Adding a mobile app
+
+Build a standalone Ionic app (framework built on AngularJS) with mock data providers
+Make client aware of business rules for constructing the flash apps, use that here.
+App is just bootstrapped by Symfony, it just thinks JS is an asset.
+Talk about why this is awesome.
+
+---
+
+# Architecture
+
+![Default-aligned image](dt_3.png)
+
+---
+
+# Changing polling to WebSockets
+
+Tried WAMP, crashed the freebsd server
+PHP wasn’t designed as an event-loop
+Wanted to use Node.js as it is so well known for doing this job very well
+Added the 100-ish lines of node.js, and code to SF for authentication, switched out the JS API logic 
+It just worked becuase the architecture supported it
+It required a bit of messing around with our LB in prod
+
+---
+
+# Architecture
+
+![Default-aligned image](dt_4.png)
+
+---
+
+# Back office client view
+
+Use technique for ionic app; back office view is just a client
+
+---
+
+# Architecture
+
+![Default-aligned image](dt_5.png)
+
+---
+
+# Seperation of concerns
+
+What do I have to think about when building the app?
+
+![Default-aligned image](dt_5_concerns.png)
+
+---
+
+# Repetition, repetition, repetition 
+## Isolate, isolate, isolate!
+
+---
+
+# Use other things
+## Strong data contracts
+
+---
+
+# Thanks! :D 
+## Build things step-by-step. Isolate everything.
+
+@BrianJGraham
+
+todo: add retrospectives to each thing!
+
+think about:
+
+APIs
+Services
+Dependency Management
+Incremental shipping.
+
+---
+
+# Introduction
+
+---
+
+# Introduction
+
+    </textarea>
+    <script src="//gnab.github.io/remark/downloads/remark-latest.min.js">
+    </script>
+    <script>
+      var slideshow = remark.create();
+    </script>
+  </body>
+</html>
