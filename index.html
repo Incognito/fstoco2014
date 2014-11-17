@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Title</title>
+    <title>FSTOCO 2014 - Combine everything</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <style type="text/css">
       @import url(http://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
@@ -383,29 +383,54 @@ class: center, middle
 
 ---
 
-# Where things started
+# Pre-refactoring
 
 * Symfony1.0 powered
   * Web Dashboard
   * App loading
 * Legacy Zend AMF code
+  * Fetched directly from database
 * Monolithic flash app
   * Configured by manually built XML
-
-* The database was modified by external applications :(
+* The database was modified by external applications
 
 * ... it worked!
 
 ---
 
-# Where things started
+# Today
+
+* SF2 backend
+  * Transforms DB objects to JSON
+  * Builds XML file in compliance with backend logic
+  * Provides RESTful API endpoints
+  * Push JSON objects to redis queue
+* Socket.io manages events
+* Added a mobile app
+* Added a back-office app
+* Some business logic is still tightly coupled
+* No monoliths
+* Clear responsibilities!
+
+---
+
+# How we got there
+
+General concepts that will be repeated
+
+* Isolate applications
+* Make contracts
+* Step-by-step
+
+---
+
+# Pre-refactoring
 
 ![Default-aligned image](old_dt.png)
 
 * It worked... 
 * Where's the model?
 * How can we maintain this?
-
 
 ---
 
@@ -417,53 +442,41 @@ class: center, middle
   * Remove voodoo
   * Remove CRM's DB
 
-
----
-
-# Where the product is now
-
-* SF2 backend
-  * Transforms DB objects to JSON
-  * Builds XML file in compliance with backend logic
-
-Provides RESTful API endpoints
-Some business logic is still tightly coupled.
-Push JSON objects to redis queue
-NodeJS subscribes for new JSON and pushes to specific client
-More dynamic flash app with JS capable of changing logic, still some tight coupled logic
-Back-office uses APIs now
-Mobile app
-Back-office telemetry view and mobile app are just presentation clients like the slide show.
-No monoliths!
-Contracts!
-
-
----
-
-# How we got there
-
-General concepts that will be repeated
-
----
-
-# JavaScript gateway to Flash 
-
-So we had AMF… What’s AMF?
-Later we used JS, what’s that like?
-API interface
-XHR polling
-App interface
-Flash ExternalInterface
-
 ---
 
 # Symfony2 Backend
 
-Add cache queue layer
-use redis queue because already use it for PHP session variable
-Talk about “threaded” issue of fetching data that changes each time
-Transform data to JSON (very interoperable format)
-Transform data to XML (flash app still uses this. we only added a JS gateway)
+* Establish basic model format in one place
+  * Transform data to JSON for polling
+  * Transform data to XML for Flash app config
+* Remove external database manipulation; added API
+
+---
+
+# Symfony2 Backend Code Structure
+
+---
+
+# Symfony2 Backend Retrospective
+
+---
+
+# JavaScript gateway to ActionScript (Flash)
+
+It used AMF, switched to a JS layer
+
+* API interface
+* XHR polling
+* App interface
+* Flash ExternalInterface
+
+---
+
+# JS AS Code Changes
+
+---
+
+# JS AS Retrospective
 
 ---
 
@@ -473,27 +486,60 @@ Transform data to XML (flash app still uses this. we only added a JS gateway)
 
 ---
 
+# Performance boost!
+
+* Kind of slow, added redis
+
+Show code.
+
+---
+
 # Architecture
 
 ![Default-aligned image](dt_2.png)
 
 ---
 
-# Back office logic hooks
+# Back office integration
 
-Remove external database everything
-API calls put changes to a presentation
-Remove external database everything
-API calls put changes to a presentation
+* API calls put changes to a presentation
+* Remove external database everything
+* API calls put changes to a presentation
+
+---
+
+# Back office code
+
+add code
+
+---
+
+# Back office Retrospective
+
+
+---
+
+# Architecture
+
+![Default-aligned image](dt_2.png)
 
 ---
 
 # Adding a mobile app
 
-Build a standalone Ionic app (framework built on AngularJS) with mock data providers
-Make client aware of business rules for constructing the flash apps, use that here.
-App is just bootstrapped by Symfony, it just thinks JS is an asset.
-Talk about why this is awesome.
+* Build a standalone Ionic app (AngularJS)
+  * mock data providers
+* Uses same configuration values as the flash app
+* Symfony doesn't know about app logic, it just looks like an asset
+  * Talk about why this is awesome.
+
+---
+
+# Mobile app code
+
+---
+
+# Mobile app retrospective
 
 ---
 
@@ -505,12 +551,21 @@ Talk about why this is awesome.
 
 # Changing polling to WebSockets
 
-Tried WAMP, crashed the freebsd server
-PHP wasn’t designed as an event-loop
-Wanted to use Node.js as it is so well known for doing this job very well
-Added the 100-ish lines of node.js, and code to SF for authentication, switched out the JS API logic 
-It just worked becuase the architecture supported it
-It required a bit of messing around with our LB in prod
+* Tried PHP WAMP, it crashed the server
+  * PHP wasn’t designed as an event-loop
+* Decided to use the well-known Node.js and Socket.io
+* Added the 150-ish lines of node.js and SF2 for authentication
+* switched out the JS XHR polling logic for a Socket.io client
+* It just worked becuase the architecture supported it
+* It required a bit of messing around with our LB in prod
+
+---
+
+# WebSockets code
+
+---
+
+# WebSockets retrospective
 
 ---
 
@@ -522,7 +577,16 @@ It required a bit of messing around with our LB in prod
 
 # Back office client view
 
-Use technique for ionic app; back office view is just a client
+* Use same technique for ionic app
+  * back office view is just a client
+
+---
+
+# Back Office code
+
+---
+
+# Back Office retrospective
 
 ---
 
@@ -534,7 +598,9 @@ Use technique for ionic app; back office view is just a client
 
 # Seperation of concerns
 
-What do I have to think about when building the app?
+What do I have to think about when building most of the app?
+
+When do I break backward compatability?
 
 ![Default-aligned image](dt_5_concerns.png)
 
@@ -543,6 +609,9 @@ What do I have to think about when building the app?
 # Repetition, repetition, repetition 
 ## Isolate, isolate, isolate!
 
+* Isolate JS into apps
+* Isolate JS from your app
+
 ---
 
 # Use other things
@@ -550,27 +619,17 @@ What do I have to think about when building the app?
 
 ---
 
+class: center, middle
+
 # Thanks! :D 
-## Build things step-by-step. Isolate everything.
+<br/>
 
-@BrianJGraham
+## Build things step-by-step
+## Isolate everything
 
-todo: add retrospectives to each thing!
+<br/>
 
-think about:
-
-APIs
-Services
-Dependency Management
-Incremental shipping.
-
----
-
-# Introduction
-
----
-
-# Introduction
+### @BrianJGraham
 
     </textarea>
     <script src="//gnab.github.io/remark/downloads/remark-latest.min.js">
