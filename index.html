@@ -3,6 +3,7 @@
   <head>
     <title>FSTOCO 2014 - Combine everything</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="description" content="Ever try to scale out a websocket server for your PHP site only to realize you're going to have some serious performance issues? Every need to integrate that same site with a legacy flash game? Want to make a mobile site on your phone that controls the game? Don't re-write everything from scratch! Don't make a monolithic blob of software! Don't be limited by your platform, language, or legacy systems! I will show you how my team has used APIs, services and dependency management to cleanly separate all of these thing, build a new back-end, tie into the flash, integrated it with our legacy back-office system, and ship incrementally.">
     <style type="text/css">
       @import url(http://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
 
@@ -698,22 +699,123 @@ General concepts that will be repeated
 
 ---
 
-HEAD
+# Symfony2 Migration
 
-# Symfony2 Backend
 
 * Establish basic model format in one place
+
   * Transform data to JSON for polling
+
   * Transform data to XML for Flash app config
+
 * Remove external database manipulation; added API
 
 ---
 
-# Symfony2 Backend Code Structure
+# Symfony2 Migration
+## Models
+
+* Now models have a home; data is sourced from one place. Data is transformed into what is needed.
+
+```PHP
+class ApiController
+{
+    // Called one time on page load
+    public function configurationAction( Presentation $pres )  {
+        $content = $this->get('ep_api.transformer')
+*            ->transformToXml('presentation_collection', $pres)
+        ;
+
+        return new Response($content);
+    }
+
+    // This method gets polled, remember me, I come up later in the presentation
+    public function slideStateAction( Presentation $pres )  {
+        $content = $this->get('ep_api.transformer')
+*            ->transformToArray('slide_view', $pres)
+        ;
+
+        return new Response($content);
+    }
+}
+```
 
 ---
 
-# Symfony2 Backend Retrospective
+# Symfony2 Migration
+## Transformers
+
+```PHP
+class SlideToArrayTransformer {
+
+    private $transformerContainer;
+
+    public function __construct($transformerContainer) { /***/ }
+
+    public function transform($pres) {
+        $result = [];
+        
+        foreach ($pres->getSlide->getComponents() as $component) {
+*            $content = $this
+*                ->$transformerContainer
+*                ->transformToArray($component->getName(), $component);
+
+             $result[] = $content;
+        }
+        
+        return $result;
+    }
+
+}
+```
+
+---
+
+# Sf2 Model Retrospective
+
+* Good
+  * One authority on what the model is
+
+* Less good
+  * Flash app assumed old models
+
+---
+
+# Symfony2 Migration
+## Add API
+
+* Now the API delegates between product and CRM database
+
+```PHP
+class PrivateApiController {
+    public function updateUsersAction(Request $request, Presentation $presentation) {
+*        $presentation->updateUsers($request->getUsers());
+    }
+}
+
+class Presentation {
+    public unction updateUsers($users) 
+        foreach ($users as $user) {
+           /*
+              Business logic about 
+              adding users to presentation
+           */ 
+        }
+    }
+}
+```
+
+---
+
+# Sf2 API Retrospective
+
+* Good
+  * No more voodoo on the database, app determines what happens 
+
+* Less good
+  * Needed to do this on both sides, deploy two products at once.
+  * Broke what the flash app expected; "broken contract"
+  * Was not an incramental ship, but perhaps it was better in this case?
 
 ---
 
@@ -721,18 +823,245 @@ HEAD
 
 It used AMF, switched to a JS layer
 
-* API interface
 * XHR polling
+
+---
+
+# JavaScript gateway to ActionScript (Flash)
+
+It used AMF, switched to a JS layer
+
+* XHR polling
+* API interface
+
+---
+
+# JavaScript gateway to ActionScript (Flash)
+
+It used AMF, switched to a JS layer
+
+* XHR polling
+* API interface
+* App interface
+
+---
+
+# JavaScript gateway to ActionScript (Flash)
+
+It used AMF, switched to a JS layer
+
+* XHR polling
+* API interface
 * App interface
 * Flash ExternalInterface
 
 ---
 
-# JS AS Code Changes
+# JavaScript gateway to ActionScript (Flash)
+
+It used AMF, switched to a JS layer
+
+* XHR polling
+* API interface
+* App interface
+* Flash ExternalInterface
+
+```bash
+|-- ApiInterface
+|   |-- ApiInterface.js
+|   |-- ApiInterfaceStrategy.js
+|   |-- Topic.js
+|   `-- XHR
+|       |-- XHRInterface.js
+|       `-- XHRTransport.js
+|-- AppInterface
+|   |-- AppInterface.js
+|   |-- FacilitatorAppInterface.js
+|   `-- TeamAppInterface.js
+
+```
 
 ---
 
-# JS AS Retrospective
+# JS API layer
+
+```javascript
+    var applicationInterface = new AppInterface({
+        apiInterface: new apiInterface(),
+        flashElement: '{{ swfId }}'
+        topic: new Topic('someSubscriptionTopic', '{{ url('sf2_endpoint') }}'),
+        debug: {{ app.debug ? 'true' : 'false '}},
+*        initializationValues: {{ initializationValues }}
+    });
+```
+* Pass a config value to your app
+
+---
+
+# JS API layer
+
+```javascript
+    var applicationInterface = new AppInterface({
+*        apiInterface: new apiInterface(),
+        flashElement: '{{ swfId }}'
+        topic: new Topic('someSubscriptionTopic', '{{ url('sf2_endpoint') }}'),
+        debug: {{ app.debug ? 'true' : 'false '}},
+        initializationValues: {{ initializationValues }}
+    });
+```
+
+* The API can be changed
+
+---
+
+# JS APP layer
+
+```javascript
+*    var applicationInterface = new AppInterface({
+        apiInterface: new apiInterface(),
+        flashElement: '{{ swfId }}'
+        topic: new Topic('someSubscriptionTopic', '{{ url('sf2_endpoint') }}'),
+        debug: {{ app.debug ? 'true' : 'false '}},
+        initializationValues: {{ initializationValues }}
+    });
+
+    swfobject.embedSWF( // Third party flash loading library
+        '{{ asset_flash('app.swf') }}',
+        '{{ swfId }}',
+        ...,
+        {
+          jsPublishEndpoint: function calledWhenFlashPushesData(data) {
+*            applicationInterface.publish(data);
+          }
+        }
+    );
+```
+
+* Flash ExternalInterface pushes commands to the App. 
+
+---
+
+# JS API layer
+
+App subscribes to API data and connects to gritty transport logic
+```javascript
+AppInterface.prototype._notifyInit = function(){
+    // ...
+*    this._apiInterface.subscribe(this._apiEndpoint)
+}
+```
+
+---
+
+# JS API layer
+
+App subscribes to API data and connects to gritty transport logic
+```javascript
+AppInterface.prototype._notifyInit = function(){
+    // ...
+    this._apiInterface.subscribe(this._apiEndpoint)
+}
+```
+```javascript
+XHRInterface.prototype.subscribe = function(endpoint){
+    // ...
+*    this._XHRtransport.poll(endpoint);
+}
+```
+
+---
+
+# JS API layer
+
+App subscribes to API data and connects to gritty transport logic
+```javascript
+AppInterface.prototype._notifyInit = function(){
+    // ...
+    this._apiInterface.subscribe(this._apiEndpoint)
+}
+```
+```javascript
+XHRInterface.prototype.subscribe = function(endpoint){
+    // ...
+    this._XHRtransport.poll(endpoint);
+}
+```
+Gritty transport logic
+```javascript
+XHRTransport.prototype.poll = function(endpoint) {
+    this._request('GET', endpoint).then(function(){
+*        // pass results to callback passed from the APP
+    });
+}
+```
+
+---
+
+# JS API layer
+
+App subscribes to API data and connects to gritty transport logic
+```javascript
+AppInterface.prototype._notifyInit = function(){
+    // ...
+*    this._apiInterface.subscribe(this._apiEndpoint)
+}
+```
+```javascript
+XHRInterface.prototype.subscribe = function(endpoint){
+    // ...
+*    this._XHRtransport.poll(endpoint);
+}
+```
+Gritty transport logic
+```javascript
+XHRTransport.prototype.poll = function(endpoint) {
+    this._request('GET', endpoint).then(function(){
+*        // pass results to callback passed from the APP
+    });
+}
+```
+App pushes to Flash
+```javascript
+AppInterface.prototype._notify(command, data) {
+*    this._el.flashElement({command: command, properties: data});
+}
+```
+
+---
+
+# JS API layer
+
+App publishes data sent from flash
+
+```javascript
+appInterface.publish(data) // Flash calls this
+```
+App publishes to API
+```javascript
+AppInterface.prototype.publish = function(data) {
+    this._apiInterface.publish(this._apiEndpoint, data)
+}
+```
+Api Interface connects to gritty transport logic
+```javascript
+XHRInterface.prototype.publish = function(data) {
+    this._XHRtransport._request('PUT', data)
+}
+```
+
+---
+
+# JS Layer Retrospective 
+
+* Good
+  * Easier to change transports (websockets, mocks, etc)
+  * Easy to test and develop on
+  * Easy to tie in multiple apps and features (profilers, etc)
+  * Can shim data formats in both directions
+
+* Less good
+  * Had to ship with previous backend change
+  * Adds a new level of complexity
 
 ---
 
@@ -742,11 +1071,91 @@ It used AMF, switched to a JS layer
 
 ---
 
+# Performance
+
+* Kind of slow
+
+---
+
+# Performance
+
+* Kind of slow
+
+```PHP
+class ApiController
+{
+    // This method gets polled, remember me from earlier?
+    public function slideStateAction( Presentation $pres )  {
+*        $content = $this->get('ep_api.transformer')
+*            ->transformToArray('slide_view', $pres)
+        ;
+
+        return new Response($content);
+    }
+}
+```
+---
+
 # Performance boost!
 
-* Kind of slow, added redis
+* Added redis!
 
-Show code.
+```PHP
+class ApiController
+{
+    // This method gets polled, remember me, I come up later in the presentation
+    public function slideStateAction( Presentation $pres )  {
+*        $content = $this->get('ep_presentation_engine.cache_manager')
+*            ->getView($pres);
+        ;
+
+        return new Response($content);
+    }
+}
+```
+
+---
+
+# Performance boost!
+
+* Added redis!
+
+```PHP
+class ApiController
+{
+    // This method gets polled, remember me, I come up later in the presentation
+    public function slideStateAction( Presentation $pres )  {
+*        $content = $this->get('ep_presentation_engine.cache_manager')
+*            ->getView($pres);
+        ;
+
+        return new Response($content);
+    }
+```
+Change cache on write to database
+```PHP
+    public function updateSlideStateAction(Request $request, Presentation $pres)  {
+        // ... logic saves changes to database
+
+*        $content = $this->get('ep_presentation_engine.cache_manager')
+*            ->setStale($pres)
+        
+    }
+}
+```
+
+---
+
+# Redis Retrospective
+
+* Good
+  * Faster responses
+  * Lower server load
+
+* Less good
+  * COW API endpoint suffers from thread-like concurency issues
+    * Workers could have been used instead
+    * Partial caches could have also been useful
 
 ---
 
