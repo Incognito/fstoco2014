@@ -616,10 +616,102 @@ class Presentation {
 
 ---
 
+# Back office integration
+
+* Remove external database interaction
+
+--
+
+* API calls put changes to a presentation
+
+---
+
+# Back office code
+
+## Data in (CRM sends to Product)
+
+```php
+class PrivateApiController
+{
+    public function updateTeamsAction(Request $request, Presentation $presentation)
+    {
+        $users = $this->get('ep_api.transformer')
+            ->reverseTransformFromXml('user_collection', $request->getContent())
+        ;
+
+*       $presentation->setUsers($users);
+
+        return new Response(null, 204);
+    }
+```
+
+---
+
+# Back office code
+
+## Data out (Product sends to CRM)
+
+```php
+*class DeleteUserCommand {
+
+    // ...
+
+*    protected function send($userAccount, $presentation)
+    {
+        $httpClient->delete(
+            $this->getUriTemplate( 'meaningful/uri/{account}/{presentation}', [
+                account => $userAccount,
+                presentation => $presentation
+            ]);
+        )
+    }
+}
+```
+---
+
+# Back office code
+
+## Data out (Product sends to CRM)
+
+```PHP
+class ApiController extends Controller
+{
+
+    public function deleteTeamAction(Request $request, Presentation $presentation, Team $team)
+    {
+        $presentation->getTeams()->deleteTeam($team);
+
+*        $this->get('ep_api.delete_users.crm')->send(
+*            $this->getUser()->getAccount(),
+*            $team
+*        );
+    // ...
+    }
+}
+```
+
+---
+
+# Back office Retrospective
+
+* Good
+  * Mock responses
+  * Optional stand-alone mode, isolated from CRM
+  * Can control contract changes without breakage
+
+--
+
+* Less good
+  * Slower than raw SQL by a tiny amount
+
+---
+
+
 # Sf2 API Retrospective
 
 * Good
   * No more voodoo on the database, app determines what happens
+--
 
 * Less good
   * Was not an incramental ship, but perhaps it was better in this case?
@@ -652,6 +744,7 @@ It used AMF, switched to a JS layer
 * API interface
 * App interface
 * Flash ExternalInterface
+
 --
 
 ```bash
@@ -927,100 +1020,6 @@ Change cache on write to database
   * COW API endpoint suffers from thread-like concurency issues
     * Workers could have been used instead
     * Partial caches could have also been useful
-
----
-
-# Architecture
-
-![Default-aligned image](dt_2.png)
-
----
-
-# Back office integration
-
-* API calls put changes to a presentation
-* Remove external database interaction
-* API calls put changes to a presentation
-
----
-
-# Back office code
-
-## Data in (CRM sends to Product)
-
-```php
-class PrivateApiController
-{
-    public function updateTeamsAction(Request $request, Presentation $presentation)
-    {
-        $users = $this->get('ep_api.transformer')
-            ->reverseTransformFromXml('user_collection', $request->getContent())
-        ;
-
-*       $presentation->setUsers($users);
-
-        return new Response(null, 204);
-    }
-```
-
----
-
-# Back office code
-
-## Data out (Product sends to CRM)
-
-```php
-*class DeleteUserCommand {
-
-    // ...
-
-*    protected function send($userAccount, $presentation)
-    {
-        $httpClient->delete(
-            $this->getUriTemplate( 'meaningful/uri/{account}/{presentation}', [
-                account => $userAccount,
-                presentation => $presentation
-            ]);
-        )
-    }
-}
-```
----
-
-# Back office code
-
-## Data out (Product sends to CRM)
-
-```PHP
-class ApiController extends Controller
-{
-
-    public function deleteTeamAction(Request $request, Presentation $presentation, Team $team)
-    {
-        $presentation->getTeams()->deleteTeam($team);
-
-*        $this->get('ep_api.delete_users.crm')->send(
-*            $this->getUser()->getAccount(),
-*            $team
-*        );
-    // ...
-    }
-}
-```
-
----
-
-# Back office Retrospective
-
-* Good
-  * Mock responses
-  * Optional stand-alone mode, isolated from CRM
-  * Can control contract changes without breakage
-
---
-
-* Less good
-  * Slower than raw SQL by a tiny amount
 
 ---
 
