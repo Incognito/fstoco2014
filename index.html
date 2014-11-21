@@ -1245,18 +1245,47 @@ class QueuePusher {
 # WebSockets Migration 
 ## Adding Node.js
 
-1. Authenticate from data stored in redis
+Authenticate from data stored in redis
 
-TODO
+```JavaScrip
+var phpSessionId = cookie.parse(handshakeData.headers.cookie)[config.session.name];
+
+redis.get(
+  config.redis.prefix + ':node_authentication:' + phpSessionId,
+  function (error, result) {
+    return deferred.resolve(result);
+  }
+);
+
+deferred.then(
+  function (sessionString) {
+    var session;
+    session = JSON.parse(sessionString);
+    socket.handshake.sessionId = session.sessionId;
+});
+```
 
 ---
 
 # WebSockets Migration 
 ## Adding Node.js
 
-2. Push messages to correct subscribers
+Push messages to subscribers
 
-TODO
+```JavaScript
+redisClient.on('message', function (channel, rawMessage) {
+  var message = JSON.parse(rawMessage);
+  io.sockets
+    .in('/sessions/' + message.sessionId)
+    .emit(message.client, message.data);
+});
+
+io.on('connection', function (socket) {
+  socket.join('/sessions/' + socket.handshake.sessionId, function (error) {};
+  socket.emit('subscribe', socket.handshake.sessionId);
+});
+
+```
 
 ---
 
