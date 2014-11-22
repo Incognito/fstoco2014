@@ -1306,13 +1306,35 @@ io.on('connection', function (socket) {
 
 # Back Office code
 
-TODO
+```php
+<div ng-app="epEiSimpleClient" class="bootstrap-styles">
+
+    <div ng-controller="MainController">
+        <ng-include src="'views/main.html'"></ng-include>
+    </div>
+
+*   <script src="{{ asset_common('js/app.js', 'epeisimpleclient')}}"></script>
+    <link rel="stylesheet" href="{{ asset_common('css/app.css', 'epeisimpleclient')}}" />
+    <script>
+        angular.module('epEiSimpleClient').run(['$rootScope', function($rootScope) {
+*           $rootScope.configuration = {{ configJSON|raw }};
+        }]);
+    </script>
+</div>
+```
+--
+* Same thing as the angular mobile app
 
 ---
 
 # Back Office retrospective
 
-TODO
+* Good
+  * Super easy to plug in
+  * I only had to think about just that app
+
+* Less Good
+  * ???
 
 ---
 
@@ -1336,7 +1358,9 @@ When do I break backward compatability?
 ## Isolate, isolate, isolate!
 
 * Isolate apps from input
+
 --
+
 * Abstract input
 
 ---
