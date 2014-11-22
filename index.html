@@ -386,7 +386,7 @@ class: center, middle
   * High-level "decision makers"
 --
 
-  * From Toronto to Bejing, Saudi Arabia to New Zealand.
+  * From Toronto to Beijing, Saudi Arabia to New Zealand.
 --
 
   * Behind really mean firewalls
@@ -603,7 +603,7 @@ class PrivateApiController {
 }
 
 class Presentation {
-    public unction updateUsers($users) 
+    public function updateUsers($users) 
         foreach ($users as $user) {
            /*
               Business logic about 
@@ -1007,7 +1007,7 @@ Change cache on write to database
 --
 
 * Less good
-  * COW API endpoint suffers from thread-like concurency issues
+  * COW API endpoint suffers from thread-like issues
     * Workers could have been used instead
     * Partial caches could have also been useful
 
@@ -1101,7 +1101,7 @@ Change cache on write to database
 * Switched out the JS XHR polling logic for a Socket.io client
 --
 
-* It just worked becuase the architecture supported it
+* It just worked because the architecture supported it
 
 ---
 
@@ -1344,11 +1344,11 @@ io.on('connection', function (socket) {
 
 ---
 
-# Seperation of concerns
+# Separation of concerns
 
 What do I have to think about when building most of the app?
 
-When do I break backward compatability?
+When do I break backward compatibility?
 
 ![Default-aligned image](dt_5_concerns.png)
 
