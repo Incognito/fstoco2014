@@ -695,6 +695,7 @@ class ApiController extends Controller
 # Back office Retrospective
 
 * Good
+  * No more voodoo on the database, app determines what happens
   * Mock responses
   * Optional stand-alone mode, isolated from CRM
   * Can control contract changes without breakage
@@ -703,17 +704,6 @@ class ApiController extends Controller
 
 * Less good
   * Slower than raw SQL by a tiny amount
-
----
-
-
-# Sf2 API Retrospective
-
-* Good
-  * No more voodoo on the database, app determines what happens
---
-
-* Less good
   * Was not an incramental ship, but perhaps it was better in this case?
   * Needed to do this on both sides, deploy two products at once.
 
